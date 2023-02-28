@@ -7,14 +7,20 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'coordinates_translator.dart';
 
 class TextRecognizerPainter extends CustomPainter {
-  TextRecognizerPainter(this.recognizedText, this.absoluteImageSize,
-      this.rotation, this.renderBox, this.getScannedText,
-      {this.boxLeftOff = 4,
-      this.boxBottomOff = 2,
-      this.boxRightOff = 4,
-      this.boxTopOff = 2,
-      this.getRawData,
-      this.paintboxCustom});
+  TextRecognizerPainter(
+    this.recognizedText,
+    this.absoluteImageSize,
+    this.rotation,
+    this.renderBox,
+    this.getScannedText, {
+    this.boxLeftOff = 4,
+    this.boxBottomOff = 2,
+    this.boxRightOff = 4,
+    this.boxTopOff = 2,
+    this.getRawData,
+    this.paintboxCustom,
+    this.skipText = false,
+  });
 
   /// ML kit recognizer
   final RecognizedText recognizedText;
@@ -51,6 +57,9 @@ class TextRecognizerPainter extends CustomPainter {
 
   /// Narower box paint
   final Paint? paintboxCustom;
+
+  // Skip text
+  final bool skipText;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -98,7 +107,12 @@ class TextRecognizerPainter extends CustomPainter {
       ..strokeWidth = 2.0
       ..color = const Color.fromARGB(153, 102, 160, 241);
     canvas.drawRect(
-      Rect.fromLTRB(boxLeft, boxTop, boxRight, boxBottom),
+      Rect.fromLTRB(
+        boxLeft,
+        boxTop,
+        boxRight,
+        boxBottom,
+      ),
       paintbox,
     );
     List textBlocks = [];
@@ -120,24 +134,28 @@ class TextRecognizerPainter extends CustomPainter {
             var parsedText = textBlock.text;
             scannedText += " ${textBlock.text}";
 
-            final ParagraphBuilder builder = ParagraphBuilder(
-              ParagraphStyle(
+            if (!skipText) {
+              final ParagraphBuilder builder = ParagraphBuilder(
+                ParagraphStyle(
                   textAlign: TextAlign.left,
                   fontSize: 14,
-                  textDirection: TextDirection.ltr),
-            );
-            builder.pushStyle(
-                ui.TextStyle(color: Colors.white, background: background));
-            builder.addText(parsedText);
-            builder.pop();
+                  textDirection: TextDirection.ltr,
+                ),
+              );
+              builder.pushStyle(
+                ui.TextStyle(color: Colors.white, background: background),
+              );
+              builder.addText(parsedText);
+              builder.pop();
 
-            canvas.drawParagraph(
-              builder.build()
-                ..layout(ParagraphConstraints(
-                  width: right - left,
-                )),
-              Offset(left, top),
-            );
+              canvas.drawParagraph(
+                builder.build()
+                  ..layout(ParagraphConstraints(
+                    width: right - left,
+                  )),
+                Offset(left, top),
+              );
+            }
           }
         }
       }

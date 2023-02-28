@@ -20,6 +20,7 @@ class ScalableOCR extends StatefulWidget {
     this.getRawData,
     this.paintboxCustom,
     this.borderRadius = 16,
+    this.skipText = false,
   }) : super(key: key);
 
   /// Offset on recalculated image left
@@ -47,6 +48,8 @@ class ScalableOCR extends StatefulWidget {
   final Paint? paintboxCustom;
 
   final double borderRadius;
+
+  final bool skipText;
 
   @override
   ScalableOCRState createState() => ScalableOCRState();
@@ -322,21 +325,25 @@ class ScalableOCRState extends State<ScalableOCR> {
           cameraPrev.currentContext?.findRenderObject() as RenderBox;
 
       var painter = TextRecognizerPainter(
-          recognizedText,
-          inputImage.inputImageData!.size,
-          inputImage.inputImageData!.imageRotation,
-          renderBox, (value) {
-        widget.getScannedText(value);
-      }, getRawData: (value) {
-        if (widget.getRawData != null) {
-          widget.getRawData!(value);
-        }
-      },
-          boxBottomOff: widget.boxBottomOff,
-          boxTopOff: widget.boxTopOff,
-          boxRightOff: widget.boxRightOff,
-          boxLeftOff: widget.boxRightOff,
-          paintboxCustom: widget.paintboxCustom);
+        recognizedText,
+        inputImage.inputImageData!.size,
+        inputImage.inputImageData!.imageRotation,
+        renderBox,
+        (value) {
+          widget.getScannedText(value);
+        },
+        getRawData: (value) {
+          if (widget.getRawData != null) {
+            widget.getRawData!(value);
+          }
+        },
+        boxBottomOff: widget.boxBottomOff,
+        boxTopOff: widget.boxTopOff,
+        boxRightOff: widget.boxRightOff,
+        boxLeftOff: widget.boxRightOff,
+        paintboxCustom: widget.paintboxCustom,
+        skipText: widget.skipText,
+      );
 
       customPaint = CustomPaint(painter: painter);
     } else {
