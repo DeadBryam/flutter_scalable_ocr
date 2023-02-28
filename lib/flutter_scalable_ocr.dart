@@ -9,17 +9,18 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:camera/camera.dart';
 
 class ScalableOCR extends StatefulWidget {
-  const ScalableOCR(
-      {Key? key,
-      this.boxLeftOff = 4,
-      this.boxRightOff = 4,
-      this.boxBottomOff = 2.7,
-      this.boxTopOff = 2.7,
-      this.boxHeight,
-      required this.getScannedText,
-      this.getRawData,
-      this.paintboxCustom})
-      : super(key: key);
+  const ScalableOCR({
+    Key? key,
+    this.boxLeftOff = 4,
+    this.boxRightOff = 4,
+    this.boxBottomOff = 2.7,
+    this.boxTopOff = 2.7,
+    this.boxHeight,
+    required this.getScannedText,
+    this.getRawData,
+    this.paintboxCustom,
+    this.borderRadius = 16,
+  }) : super(key: key);
 
   /// Offset on recalculated image left
   final double boxLeftOff;
@@ -44,6 +45,8 @@ class ScalableOCR extends StatefulWidget {
 
   /// Narower box paint
   final Paint? paintboxCustom;
+
+  final double borderRadius;
 
   @override
   ScalableOCRState createState() => ScalableOCRState();
@@ -99,7 +102,9 @@ class ScalableOCRState extends State<ScalableOCR> {
                       height: sizeH * 19,
                       decoration: BoxDecoration(
                         color: Colors.grey,
-                        borderRadius: BorderRadius.circular(17),
+                        borderRadius: BorderRadius.circular(
+                          widget.borderRadius,
+                        ),
                       ),
                     )
                   : _liveFeedBody(),
@@ -133,8 +138,9 @@ class ScalableOCRState extends State<ScalableOCR> {
                   child: GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     child: ClipRRect(
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(16.0)),
+                      borderRadius: BorderRadius.circular(
+                        widget.borderRadius,
+                      ),
                       child: Transform.scale(
                         scale: cameraController.value.aspectRatio /
                             previewAspectRatio,
@@ -162,18 +168,19 @@ class ScalableOCRState extends State<ScalableOCR> {
             ),
             if (customPaint != null)
               LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                maxWidth = constraints.maxWidth;
-                maxHeight = constraints.maxHeight;
-                return GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onScaleStart: _handleScaleStart,
-                  onScaleUpdate: _handleScaleUpdate,
-                  onTapDown: (TapDownDetails details) =>
-                      onViewFinderTap(details, constraints),
-                  child: customPaint!,
-                );
-              }),
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  maxWidth = constraints.maxWidth;
+                  maxHeight = constraints.maxHeight;
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onScaleStart: _handleScaleStart,
+                    onScaleUpdate: _handleScaleUpdate,
+                    onTapDown: (TapDownDetails details) =>
+                        onViewFinderTap(details, constraints),
+                    child: customPaint!,
+                  );
+                },
+              ),
           ],
         ),
       );
